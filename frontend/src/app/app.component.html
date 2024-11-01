@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Titulo</title>
+</head>
+<body>
+    <h1 class="text-center display-3"> Agenda tu Cita - CS Jorge Chavez </h1>
+    <div class="container mt-3">
+        <div class="row align-items-start">
+            <div class="col-3">
+                <h3 class="display-6"> Datos: </h3>
+        
+                <div class="mb-3 mt-4">
+                    <label for="exampleFormControlInput1" class="form-label">Nombre</label>
+                    <input type="text" class="form-control" [(ngModel)]="cita.nombre" id="exampleFormControlInput1" placeholder="Nombre">
+                    
+                    <label for="exampleFormControlInput1" class="form-label">Apellido Paterno</label>
+                    <input type="text" class="form-control" [(ngModel)]="cita.apellido_paterno" id="exampleFormControlInput1" placeholder="Apellido Paterno">
+                    
+                    <label for="exampleFormControlInput1" class="form-label">Apellido Materno</label>
+                    <input type="text" class="form-control" [(ngModel)]="cita.apellido_materno" id="exampleFormControlInput1" placeholder="Apellido Materno">
+    
+                    <label for="exampleFormControlInput1" class="form-label">Departamento</label>
+                    <div class="col-md">
+                        <select [(ngModel)] = "cita.departamento" class="form-select" id="floatingSelectGrid" (change)="onDepartamentoChange($event)">
+                            <option selected>Departamento</option>
+                            <option *ngFor="let departamento of departamentos">{{departamento.valor}}</option>
+                        </select>
+                    </div>
+                    <label for="exampleFormControlInput1" class="form-label">Provincia</label>
+                    <div class="col-md">
+                        <select [(ngModel)] = "cita.provincia" class="form-select" id="floatingSelectGrid"  (change)="onProvinciaChange($event)">
+                            <option selected>Provincia</option>
+                            <option *ngFor="let provincia of provincias">{{provincia.valor}}</option>
+                        </select>
+                    </div>
+                    <label for="exampleFormControlInput1" class="form-label">Distrito</label>
+                    <div class="col-md">
+                        <select [(ngModel)] = "cita.distrito" class="form-select" id="floatingSelectGrid">
+                            <option selected>Distrito</option>
+                            <option *ngFor="let distrito of distritos">{{distrito.valor}}</option>
+                        </select>
+                    </div>
+                </div>
+    
+                <div class="container">
+                    <h3>Elija servicio</h3>
+                    <div class="form-check" *ngFor="let tramite of tramites; let i = index">
+                      <input class="form-check-input" type="radio" name="flexRadioDefault" [id]="'flexRadioDefault' + i" 
+                             [(ngModel)]="cita.tramite" [value]="tramite.opcion" (change)="onRadioChange($event)">
+                      <label class="form-check-label" [for]="'flexRadioDefault' + i">
+                        {{ tramite.opcion }}
+                      </label>
+                    </div>
+                    
+                </div>
+                <div class="mt-3">
+                    <button type="button" class="btn btn-primary me-3" (click)="cancelar_cita()">Cancelar</button>
+                    <button type="button" (click)="registrar_cita()" class="btn btn-primary">Registrar</button>
+                </div>
+            </div>
+            <div class="col-3">
+                <h3 class="display-6">Elija Hora: </h3>
+                <div class="container text-center mt-4">
+                  <div class="row" *ngFor="let hora of horario; index as i">
+                    <div class="col-3"><label for="">{{hora.hora}}</label></div>
+                    <div class="col-9 mb-2">
+                      <button type="button" (click)="proceso_cita(hora.hora)" class="btn btn-outline-dark w-100 border"
+                      [ngClass]="{
+                        'bg-secondary text-white': hora.estado === 'bloqueado',
+                        'bg-info': hora.estado === 'reservado',
+                        'libre': hora.estado === 'libre'
+                      }"    
+                      >{{hora.estado}}</button>
+                    </div>
+                  </div>
+                </div>
+                <div class="alert alert-primary" role="alert" *ngIf="mensaje">
+                    <div class="" role="alert" *ngIf="mensajitus">
+                        {{mensajitus}}
+                    </div>
+                    <h1 *ngIf="cuenta_regresiva<=10 && cuenta_regresiva>0 && estado_registrado==false" class="d-flex justify-content-center"><span class="badge text-bg-secondary">{{cuenta_regresiva}}</span></h1>
+                </div>
+            </div>
+            <div class="col-6">
+                <h3 class="display-6"> Lista de citas </h3>
+                <p *ngIf="lista_citas?.length==0">No existe citas registradas</p>
+                <table class="table table-sm mt-4" *ngIf="lista_citas?.length>0">
+                    <thead>
+                      <tr>
+                        <th class="texto-dato" scope="col">id</th>
+                        <th class="texto-dato" scope="col">Nombre</th>
+                        <th class="texto-dato" scope="col">Ap. Paterno</th>
+                        <th class="texto-dato" scope="col">Ap. Materno</th>
+                        <th class="texto-dato" scope="col">Departamento</th>
+                        <th class="texto-dato" scope="col">Provincia</th>
+                        <th class="texto-dato" scope="col">Distrito</th>
+                        <th class="texto-dato" scope="col">Hora reservada</th>
+                        <th class="texto-dato" scope="col">Servicio</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let cita of lista_citas; index as i">
+                        <th scope="row"><p class="texto-dato">{{cita.key}}</p></th>
+                        <td><p class="texto-dato">{{cita.value.nombre}}</p></td>
+                        <td><p class="texto-dato">{{cita.value.apellido_paterno}}</p></td>
+                        <td><p class="texto-dato">{{cita.value.apellido_materno}}</p></td>
+                        <td><p class="texto-dato">{{cita.value.departamento}}</p></td>
+                        <td><p class="texto-dato">{{cita.value.provincia}}</p></td>
+                        <td><p class="texto-dato">{{cita.value.distrito}}</p></td>
+                        <td class="text-center"><p class="texto-dato">{{cita.value.hora_reservada}}</p></td>
+                        <td><p class="texto-dato">{{cita.value.tramite}}</p></td>
+                      </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>
